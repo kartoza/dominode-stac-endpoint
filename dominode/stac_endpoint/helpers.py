@@ -239,3 +239,4 @@ def createCollection(collection, collection_name):
     collection.add_link(pystac.Link.item(f"{os.getenv('URL')}/stac/collections/{collection_name}/items/"))
 
     return collection
+
