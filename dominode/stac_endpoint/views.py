@@ -1,35 +1,54 @@
 import json
+import unicodedata
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from minio import Minio
-from minio.error import S3Error
+from dotenv import load_dotenv
+from .minio_client.client import client
+from .minio_client.map_catalog import MapIndex
 
-
-client = Minio(
-    'api.minio.do.kartoza.com', 
-    access_key='TlL5eQVvBUXkcY7NQl2J',
-    secret_key='5OlXF6ZEKJNQSrzwx7gQCOD9OgcovQgF7OxObdps', 
-)
+load_dotenv()
 
 # Create catalog
 @api_view(['GET'])
 def catalog(request):
-    objects = client.list_objects('dominode')
-    for obj in objects:
-        print(obj)
-    return Response({"status": 200})
+    map_index = MapIndex()
+    index = map_index.mapCatalog()
+    str = "/"
+    file_path = str.join(index)
+    response = client.get_object("dominode", file_path)
+    data = json.load(response)
+    return Response(data)
 
 # Create collection
 @api_view(['GET'])
-def collections(request):
-    return Response({"status": 200})
+def collection(request, collection_name):
+
+    map_index = MapIndex()
+    index = map_index.mapCollection(collection_name)
+    str = "/"
+    file_path = str.join(index)
+    response = client.get_object("dominode", file_path)
+    data = json.load(response)
+    return Response(data)
 
 # Create item collection
 @api_view(['GET'])
 def item_collection(request, collection_name):
-    return Response({"status": 200})
+    map_index = MapIndex()
+    index = map_index.mapItemCollection(collection_name)
+    str = "/"
+    file_path = str.join(index)
+    response = client.get_object("dominode", file_path)
+    data = json.load(response)
+    return Response(data)
 
 #Create Item
 @api_view(['GET'])
 def item(request, collection_name, item_name):
-    return Response({"status": 200})
+    map_index = MapIndex()
+    index = map_index.mapItem(collection_name, item_name)
+    str = "/"
+    file_path = str.join(index)
+    response = client.get_object("dominode", file_path)
+    data = json.load(response)
+    return Response(data)
