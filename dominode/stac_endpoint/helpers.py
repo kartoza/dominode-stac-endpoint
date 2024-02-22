@@ -177,7 +177,10 @@ def handleXML(xmlItem, collection_name, item_name):
 
     xmlDict = xmltodict.parse(xmlData)
      
-    dataProperties = xmlDict['metadata']['dataIdInfo']
+    try:
+        dataProperties = xmlDict['metadata']['dataIdInfo']
+    except:
+        dataProperties = None
 
     return dataProperties
 
@@ -217,3 +220,22 @@ def getItemsSpatial(collection_name, folder_structure):
                 footprintArr.append(mapping(footprint))
                 bboxArr.append(mapping(footprint))
     return {"footprint": footprintArr, "bbox": bboxArr}
+
+def createCollection(collection, collection_name):
+    spatialArr = getItemsSpatial(folder_structure=collection["items"], collection_name=collection_name)
+    spatial_extent = pystac.SpatialExtent(bboxes=[spatialArr["bbox"]])
+    collection_interval = [pd.to_datetime(datetime.date.today(), infer_datetime_format=True), None]
+    temporal_extent = pystac.TemporalExtent(intervals=[collection_interval])
+    collection_extent = pystac.Extent(spatial=spatial_extent, temporal=temporal_extent)
+    
+    collection = pystac.Collection(
+        id=collection_name,
+        description="sample description of collection",
+        extent=collection_extent,
+        license="",
+        href=f"{os.getenv('URL')}/stac/collections/{collection_name}/"
+    )
+
+    collection.add_link(pystac.Link.item(f"{os.getenv('URL')}/stac/collections/{collection_name}/items/"))
+
+    return collection

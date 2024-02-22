@@ -19,9 +19,12 @@ class MapIndex():
         for obj in response:
             object_name = obj.object_name
             li = convertToList(object_name)
-            if "index.json" in li:
+            if "index.json" == li[1]:
                 indexArr.append(li)
-        return indexArr[0]
+        if len(indexArr) > 0:
+            return indexArr[0]
+        else:
+            return indexArr
     
     def mapCollection(self, collection_name):
         response = client.list_objects('dominode', prefix="stac", recursive=True)
@@ -32,7 +35,10 @@ class MapIndex():
             if len(li) == 3:
                 if "index.json" in li and li[1] == collection_name:
                     collectionArr.append(li)
-        return collectionArr[0]
+        if len(collectionArr) > 0:
+            return collectionArr[0]
+        else:
+            return collectionArr
     
 
     def mapItemCollection(self, collection_name):
@@ -44,7 +50,10 @@ class MapIndex():
             if len(li) == 4:
                 if "index.json" in li and li[1] == collection_name:
                     collectionArr.append(li)
-        return collectionArr[0]
+        if len(collectionArr) > 0:
+            return collectionArr[0]
+        else:
+            return collectionArr
     
     def mapItem(self, collection_name, item_name):
         response = client.list_objects('dominode', prefix="stac", recursive=True)
@@ -56,5 +65,8 @@ class MapIndex():
                 print(li)
                 if "index.json" in li and li[1] == collection_name and li[3] == item_name:
                     collectionArr.append(li)
-        return collectionArr[0]
+        if len(collectionArr) > 0:
+            return collectionArr[0]
+        else:
+            return collectionArr
 

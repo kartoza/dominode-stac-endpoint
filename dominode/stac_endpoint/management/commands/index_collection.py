@@ -2,9 +2,10 @@ from typing import Any
 from django.core.management.base import BaseCommand
 import json
 from ...minio_client.crawl_collection import CrawlAllCollections
+from ...minio_client.map_catalog import MapIndex
 import pystac
 import os
-from ...helpers import getItemsSpatial
+from ...helpers import createCollection
 import pandas as pd
 import datetime
 from ...minio_client.client import client
@@ -20,34 +21,63 @@ class Command(BaseCommand):
         for collection in folder_structure:
 
             collection_name = collection["collection_name"]
+            itemsArr = collection["items"]
 
-            spatialArr = getItemsSpatial(folder_structure=collection["items"], collection_name=collection_name)
-            spatial_extent = pystac.SpatialExtent(bboxes=[spatialArr["bbox"]])
-            collection_interval = [pd.to_datetime(datetime.date.today(), infer_datetime_format=True), None]
-            temporal_extent = pystac.TemporalExtent(intervals=[collection_interval])
-            collection_extent = pystac.Extent(spatial=spatial_extent, temporal=temporal_extent)
-            
-            collection = pystac.Collection(
-                id=collection_name,
-                description="sample description of collection",
-                extent=collection_extent,
-                license="",
-                href=f"{os.getenv('URL')}/stac/collections/{collection_name}/"
-            )
+            map_index = MapIndex()
+            index = map_index.mapItemCollection(collection_name)
 
-            collection.add_link(pystac.Link.item(f"{os.getenv('URL')}/stac/collections/{collection_name}/items/"))
+            if len(index) > 0:
+                self.stdout.write('index.json exists')
+                str = "/"
+                file_path = str.join(index)
+                response = client.get_object("dominode", file_path)
+                data = json.load(response)
 
-            full_path = os.path.realpath(__file__)
-            dir_path = (os.path.dirname(full_path))
-            file_path = f'{dir_path}/tmp/collection/index.json'
+                # check for new items
+                featuresArr = data["features"] 
+                featuresIndex = []
+                featuresNotIndexed = []
+                for feature in featuresIndex:
+                    featuresIndex.append(feature["id"])
 
-            with open(file_path, 'w') as fp:
-                json.dump(collection.to_dict(), fp, indent=4)
+                for item in itemsArr:
+                    if item["item_name"] not in featuresIndex:
+                        featuresNotIndexed.append(item)
 
-            # Upload data with progress bar.
-            result = client.fput_object(
-                "dominode", f"stac/{collection_name}/index.json", file_path
-            )
+                if len(featuresNotIndexed) > 0:
+                    collection_items = []
 
-            os.remove(file_path)
+                    _collection = createCollection(collection, collection_name)
+
+                    full_path = os.path.realpath(__file__)
+                    dir_path = (os.path.dirname(full_path))
+                    file_path = f'{dir_path}/tmp/collection/index.json'
+
+                    with open(file_path, 'w') as fp:
+                        json.dump(_collection.to_dict(), fp, indent=4)
+
+                    # Upload data with progress bar.
+                    result = client.fput_object(
+                        "dominode", f"stac/{collection_name}/index.json", file_path
+                    )
+
+                    os.remove(file_path)
+
+
+            else:
+                _collection = createCollection(collection, collection_name)
+
+                full_path = os.path.realpath(__file__)
+                dir_path = (os.path.dirname(full_path))
+                file_path = f'{dir_path}/tmp/collection/index.json'
+
+                with open(file_path, 'w') as fp:
+                    json.dump(_collection.to_dict(), fp, indent=4)
+
+                # Upload data with progress bar.
+                result = client.fput_object(
+                    "dominode", f"stac/{collection_name}/index.json", file_path
+                )
+
+                os.remove(file_path)
         self.stdout.write('Collections has been indexed successfully')
