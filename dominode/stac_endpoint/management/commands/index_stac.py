@@ -13,4 +13,4 @@ class Command(BaseCommand):
         indexItemCollection()
         indexItem()
 
-        self.stdout.write('Item collection has been indexed successfully')
+        self.stdout.write('STAC has been indexed successfully')
