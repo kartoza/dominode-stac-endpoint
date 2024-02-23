@@ -35,7 +35,7 @@ This command indexes all the folders on MINIO and creates a STAC Catalog on MINI
 ## Catalog endpoint
 
 - The enpoint for a catalog is `/stac/`
-- This fetches a STAC Catlog in which STAC Collections are defined
+- This fetches a STAC Catalog in which STAC Collections are defined
 
 ## Collection endpoint
 
@@ -45,7 +45,7 @@ This command indexes all the folders on MINIO and creates a STAC Catalog on MINI
 ## Feature Collection endpoint
 
 - The enpoint for a catalog is `/stac/collections/<collection_name>/items/`
-- This fetches a Features Collection in which features are defined which belong to a collection
+- This fetches a Features Collection in which features are defined that belong to a collection
 
 ## Item endpoint
 
@@ -59,9 +59,13 @@ This command indexes all the folders on MINIO and creates a STAC Catalog on MINI
 Folders that are in bold need to have the same name. Folders in italic are the name of collections and items
 
 |-**stac**
+<br>
 |--*<collection_name>*
+<br>
 |---**items**
+<br>
 |----*<item_name>*
+<br>
 |-----*upload tif/las/parquet/xml files that are associated with an item here*
 
 
