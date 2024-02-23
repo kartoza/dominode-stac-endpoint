@@ -39,17 +39,17 @@ This command indexes all the folders on MINIO and creates a STAC Catalog on MINI
 
 ## Collection endpoint
 
-- The enpoint for a catalog is `/stac/collections/<collection_name>/`
+- The enpoint for a collection is `/stac/collections/<collection_name>/`
 - This fetches a STAC Collection in which STAC Collections are defined
 
 ## Feature Collection endpoint
 
-- The enpoint for a catalog is `/stac/collections/<collection_name>/items/`
+- The enpoint for a feature collection is `/stac/collections/<collection_name>/items/`
 - This fetches a Features Collection in which features are defined that belong to a collection
 
 ## Item endpoint
 
-- The enpoint for a catalog is `/stac/collections/<collection_name>/items/<item_name>/`
+- The enpoint for an item is `/stac/collections/<collection_name>/items/<item_name>/`
 - This fetches a Features Collection in which features are defined that belong to a collection
 
 # Folder Structure on MINIO
